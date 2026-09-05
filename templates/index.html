@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Background Remover</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            background: #f4f7fb;
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            width: min(600px, 100%);
+            padding: 40px;
+            background: white;
+            border-radius: 24px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+        }
+
+        h1 {
+            margin: 0 0 10px;
+            font-size: 36px;
+        }
+
+        p {
+            margin: 0 0 30px;
+            color: #666;
+        }
+
+        .upload-box {
+            display: block;
+            padding: 50px 20px;
+            border: 2px dashed #bbb;
+            border-radius: 18px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .upload-box:hover {
+            border-color: #111;
+            background: #fafafa;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        button {
+            width: 100%;
+            margin-top: 20px;
+            padding: 15px;
+            border: 0;
+            border-radius: 12px;
+            background: #111;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        #fileName {
+            display: block;
+            margin-top: 15px;
+            color: #555;
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="container">
+        <h1>Background Remover</h1>
+        <p>Upload an image and remove its background.</p>
+
+        <form action="/remove-background" method="POST" enctype="multipart/form-data">
+
+            <label class="upload-box" for="image">
+                Click to select an image
+            </label>
+
+            <input
+                id="image"
+                name="image"
+                type="file"
+                accept="image/png,image/jpeg,image/webp"
+                required
+            >
+
+            <span id="fileName">No image selected</span>
+
+            <button id="removeButton" type="submit" disabled>
+                Remove Background
+            </button>
+
+        </form>
+    </main>
+
+    <script>
+        const imageInput = document.getElementById("image");
+        const fileName = document.getElementById("fileName");
+        const removeButton = document.getElementById("removeButton");
+
+        imageInput.addEventListener("change", () => {
+            const file = imageInput.files[0];
+
+            if (!file) {
+                fileName.textContent = "No image selected";
+                removeButton.disabled = true;
+                return;
+            }
+
+            fileName.textContent = file.name;
+            removeButton.disabled = false;
+        });
+    </script>
+
+</body>
+</html>
