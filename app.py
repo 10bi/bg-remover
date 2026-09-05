@@ -1,24 +1,43 @@
-from pathlib import Path
+from io import BytesIO
 
-from google.colab import files
+from flask import Flask, render_template, request, send_file
 from PIL import Image
 from rembg import remove
 
 
+app = Flask(__name__)
+
+
+@app.route("/", methods=["GET"])
+def index():
+    return render_template("index.html")
+
+
+@app.route("/remove-background", methods=["POST"])
 def remove_background():
-    uploaded_files = files.upload()
+    uploaded_file = request.files.get("image")
 
-    for filename in uploaded_files:
-        input_path = Path(filename)
-        output_path = Path(f"{input_path.stem}_no_bg.png")
+    if uploaded_file is None or uploaded_file.filename == "":
+        return "Please select an image.", 400
 
-        with Image.open(input_path) as image:
-            result = remove(image)
-            result.save(output_path, "PNG")
+    try:
+        input_image = Image.open(uploaded_file.stream)
+        output_image = remove(input_image)
 
-        print(f"Background removed: {output_path}")
+        output_buffer = BytesIO()
+        output_image.save(output_buffer, format="PNG")
+        output_buffer.seek(0)
 
-        files.download(output_path)
+        return send_file(
+            output_buffer,
+            mimetype="image/png",
+            as_attachment=True,
+            download_name="background-removed.png",
+        )
+
+    except Exception:
+        return "Unable to process the image.", 500
 
 
-remove_background()
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000)
